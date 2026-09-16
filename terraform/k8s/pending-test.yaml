@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pending-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pending-test
+  template:
+    metadata:
+      labels:
+        app: pending-test
+    spec:
+      containers:
+        - name: test
+          image: fintech-app:latest
+          resources:
+            requests:
+              cpu: "100m"
