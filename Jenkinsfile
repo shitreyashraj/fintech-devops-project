@@ -37,11 +37,8 @@ pipeline {
                     )
                 ]) {
                     bat '''
-                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-                        if %ERRORLEVEL% NEQ 0 exit /b %ERRORLEVEL%
-
-                        docker tag fintech-app:latest %DOCKER_USER%/fintech-app:latest
-                        docker push %DOCKER_USER%/fintech-app:latest
+                        echo Username=%DOCKER_USER%
+                        echo PasswordLength=%DOCKER_PASS:~0,1%
                     '''
                 }
             }
