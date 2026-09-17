@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
-                echo 'Source code checked out successfully'
+                checkout scm
             }
         }
 
@@ -23,6 +24,22 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t fintech-app:latest .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    bat 'docker tag fintech-app:latest %DOCKER_USER%/fintech-app:latest'
+                    bat 'docker push %DOCKER_USER%/fintech-app:latest'
+                }
             }
         }
     }
