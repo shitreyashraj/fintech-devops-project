@@ -28,19 +28,23 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-pat-system',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
-                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-                    bat 'docker tag fintech-app:latest %DOCKER_USER%/fintech-app:latest'
-                    bat 'docker push %DOCKER_USER%/fintech-app:latest'
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'dockerhub-pat-system',
+                usernameVariable: 'DOCKER_USER',
+                passwordVariable: 'DOCKER_PASS'
+            )
+        ]) {
+            powershell '''
+                $env:DOCKER_PASS | docker login -u $env:DOCKER_USER --password-stdin
+                if ($LASTEXITCODE -ne 0) {
+                    exit $LASTEXITCODE
                 }
-            }
+
+                docker tag fintech-app:latest "$env:DOCKER_USER/fintech-app:latest"
+                docker push "$env:DOCKER_USER/fintech-app:latest"
+            '''
         }
     }
 }
