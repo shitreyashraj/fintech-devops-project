@@ -50,8 +50,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 bat '''
-                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" set image deployment/fintech-app fintech-app=shitreyashraj/fintech-app:latest
-                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" rollout status deployment/fintech-app
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" apply -f terraform\\k8s\\configmap.yaml -f terraform\\k8s\\secret.yaml -f terraform\\k8s\\deployment.yaml -f terraform\\k8s\\service.yaml
+
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" -n fintech set image deployment/fintech-app fintech-app=shitreyashraj/fintech-app:latest
+
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" -n fintech rollout status deployment/fintech-app
                 '''
             }
         }
