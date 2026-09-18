@@ -1,20 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: fintech-app
+  namespace: fintech
+
 spec:
-  replicas: 5
+  replicas: 2
+
   selector:
     matchLabels:
       app: fintech-app
+
   template:
     metadata:
       labels:
         app: fintech-app
+
     spec:
       containers:
         - name: fintech-app
-          image: fintech-app:latest
+          image: shitreyashraj/fintech-app:latest
           imagePullPolicy: IfNotPresent
+
           ports:
             - containerPort: 5000
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: fintech-config
+            - secretRef:
+                name: fintech-secret
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 3
