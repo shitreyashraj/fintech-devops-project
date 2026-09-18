@@ -47,9 +47,12 @@ pipeline {
             }
         }
 
-        stage('Kubernetes Test') {
+        stage('Deploy to Kubernetes') {
             steps {
-                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" config current-context'
+                bat '''
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" set image deployment/fintech-app fintech-app=shitreyashraj/fintech-app:latest
+                    "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" rollout status deployment/fintech-app
+                '''
             }
         }
     }
