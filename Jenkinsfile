@@ -46,5 +46,11 @@ pipeline {
                 }
             }
         }
+
+        stage('Kubernetes Test') {
+            steps {
+                bat '"C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe" config current-context'
+            }
+        }
     }
 }
