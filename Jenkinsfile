@@ -27,21 +27,22 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-pat-system',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
-                    bat '''
-                        echo DockerUser=%DOCKER_USER%
-                        powershell -NoProfile -Command "$env:DOCKER_PASS.Length"
-                    '''
-                }
-            }
+       stage('Push Docker Image') {
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'dockerhub-pat-system',
+                usernameVariable: 'DOCKER_USER',
+                passwordVariable: 'DOCKER_PASS'
+            )
+        ]) {
+            bat '''
+                echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                if %ERRORLEVEL% NEQ 0 exit /b %ERRORLEVEL%
+
+                docker tag fintech-app:latest %DOCKER_USER%/fintech-app:latest
+                docker push %DOCKER_USER%/fintech-app:latest
+            '''
         }
     }
 }
